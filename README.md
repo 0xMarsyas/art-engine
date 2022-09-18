@@ -1,3 +1,27 @@
+GREETINGS EARTHLINGS
+
+I will soon be putting together a sharper readme for my fork of the popular hashlips/nftchef art generator. 
+
+Why is mine different than theirs? 
+
+Well---first it includes everything from the current, original Hash Lips engine. 
+
+Then, all of NFTChef's amazing work has been incorporated. Incompatible and forced layers, z-indexing, yadda yadda 
+
+There was one functionality that was lacking of for me and that was the ability to name my NFT's randomly. 
+
+So, if you want your NFTs to have lore, to have names that really capture attention -- I hope this can help you!
+
+I will finish this by 2023.
+
+xoxo from Miami
+Marsyas 
+
+
+
+
+
+
 For general questions and help, please check and/or open a discussion in
 https://github.com/nftchef/art-engine/discussions
 
