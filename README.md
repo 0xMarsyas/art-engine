@@ -1,21 +1,84 @@
-GREETINGS EARTHLINGS
+# Greetings Earthlings
 
-I will soon be putting together a sharper readme for my fork of the popular hashlips/nftchef art generator. 
+My name is Marsyas Codex, I am a dev and artist. 
 
-Why is mine different than theirs? 
+This is an art generator program originally made by Hashlips.
 
-Well---first it includes everything from the current, original Hash Lips engine. 
+Then NFT Chef made a fork that added incredible layering features.
 
-Then, all of NFTChef's amazing work has been incorporated. Incompatible and forced layers, z-indexing, yadda yadda 
+Now I have forked NFT Chef's work and added new storytelling tool that will make your metadata rich with details and stories that even Chat GPT couldn't come up with. 
 
-There was one functionality that was lacking of for me and that was the ability to name my NFT's randomly. 
+How? I'll show you below.
 
-So, if you want your NFTs to have lore, to have names that really capture attention -- I hope this can help you!
+# But first things first
 
-I will finish this by 2023.
 
-xoxo from Miami
-Marsyas 
+If you aren't familiar with the hashlips art generator, that ReadMe comes first.
+
+https://github.com/HashLips/hashlips_art_engine
+
+
+If you aren't familiar with the NFT Chef generator,  that ReadMe comes second.
+
+https://github.com/nftchef/art-engine/blob/main/README.md
+
+
+Everything from those two pieces of software are incorporated here, in the Aulos Generator. 
+
+
+## Okay I understand how the art generator and advanced layering controls, now I want my NFT's to have stories. 
+
+
+Okay great! :) 
+
+
+In Hashlips/NFTChef, your NFT's Name and Description come out in this format. 
+
+In this example, the <collection name> will be "Slippery Skunks" and the token ID 144
+
+On the OpenSea page:
+
+Name: Slippery Skunk #144
+Description: Slippery Skunks are a conniving gang of pranksters and thieves scheming on the Ethtereum blockchain. 
+
+
+
+When you use this fork, the NFT's Names and Description (and metadata) will look like this:
+
+Name: Sylvano Garcia Jr.
+
+Description: Son of the Warlord and Mafia Don by the same name, Sylvano has spent his entire life proving he's worthy of his father's legacy. Born in Miami Florida, he is an urban skunk that lives in a high rise. 
+
+Birthday: 12/15/1995
+
+Zodiac Sign: Virgo
+
+Lucky Number: 21
+
+
+## WOW ok I understand but please show me how. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
