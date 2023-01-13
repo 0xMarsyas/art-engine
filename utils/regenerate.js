@@ -24,25 +24,15 @@ const chalk = require("chalk");
 const jsonDir = `${basePath}/build/json`;
 const imageDir = `${basePath}/build/images`;
 const dnaFilePath = `${basePath}/build/_dna.json`;
+const metadataFilePath = `${basePath}/build/json/_metadata.json`;
+
 const {
-  buildDir,
-  layersDir,
   format,
-  baseUri,
-  description,
   background,
   uniqueDnaTorrance,
   layerConfigurations,
-  rarityDelimiter,
-  shuffleLayerConfigurations,
-  debugLogs,
-  extraAttributes,
-  extraMetadata,
-  incompatible,
-  forcedCombinations,
   outputJPEG,
-  emptyLayerName,
-  hashImages,
+  startIndex,
 } = require(path.join(basePath, "/src/config.js"));
 
 const {
@@ -70,8 +60,8 @@ const getDNA = () => {
 
 const createItem = (layers) => {
   let newDna = createDna(layers);
-  const exitingDNA = getDNA();
-  if (isDnaUnique(exitingDNA, newDna)) {
+  const existingDna = getDNA();
+  if (isDnaUnique(existingDna, newDna)) {
     return { newDna, layerImages: constructLayerToDna(newDna, layers) };
   } else {
     failedCount++;
@@ -108,6 +98,13 @@ const outputFiles = (_id, layerData, options) => {
   // save the metadata json
   fs.writeFileSync(`${jsonDir}/${_id}.json`, JSON.stringify(metadata, null, 2));
   console.log(chalk.bgGreenBright.black(`Recreated item: ${_id}`));
+  //TODO: update and output _metadata.json
+
+  const originalMetadata = JSON.parse(fs.readFileSync(metadataFilePath));
+  const updatedMetadata = [...originalMetadata];
+  const editionIndex = _id - startIndex;
+  updatedMetadata[editionIndex] = metadata;
+  fs.writeFileSync(metadataFilePath, JSON.stringify(updatedMetadata, null, 2));
 };
 
 const regenerateItem = (_id, options) => {
@@ -144,10 +141,26 @@ const regenerateItem = (_id, options) => {
     // paint layers to global canvas context.. no return value
     paintLayers(ctxMain, renderObjectArray, layerData);
     outputFiles(_id, layerData, options);
+
     // update the _dna.json
     const existingDna = getDNA();
     const existingDnaFlat = existingDna.map((dna) => dna.join(DNA_DELIMITER));
-    const updatedDnaList = [...existingDnaFlat, newDna];
+
+    const updatedDnaList = [...existingDnaFlat];
+    // find the correct entry and update it
+    const dnaIndex = _id - startIndex;
+    updatedDnaList[dnaIndex] = newDna;
+
+    options.debug
+      ? console.log(
+          chalk.redBright(`replacing old DNA:\n`, existingDnaFlat[dnaIndex])
+        )
+      : null;
+    options.debug
+      ? console.log(
+          chalk.greenBright(`\nWith new DNA:\n`, updatedDnaList[dnaIndex])
+        )
+      : null;
 
     fs.writeFileSync(
       path.join(dnaFilePath),

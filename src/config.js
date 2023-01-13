@@ -3,6 +3,9 @@
 const path = require("path");
 const isLocal = typeof process.pkg === "undefined";
 const basePath = isLocal ? process.cwd() : path.dirname(process.execPath);
+
+// see src/blendMode.js for available blend modes
+// documentation: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
 const { MODE } = require(path.join(basePath, "src/blendMode.js"));
 
 const buildDir = path.join(basePath, "/build");
@@ -51,7 +54,7 @@ const layerConfigurations = [
       { name: "Clothes" },
       { name: "Eyes" },
       { name: "Hair" },
-      { name: "Head Accessory" },
+      { name: "Accessory" },
       { name: "Shirt Accessories" },
     ],
   },

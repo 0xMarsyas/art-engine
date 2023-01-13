@@ -20,8 +20,6 @@ const chalk = require("chalk");
 
 const { createCanvas } = require("canvas");
 
-const keccak256 = require("keccak256");
-
 const {
   format,
   layerConfigurations,
@@ -29,11 +27,15 @@ const {
   outputJPEG,
 } = require("../src/config");
 const {
+  addMetadata,
+  constructLayerToDna,
   DNA_DELIMITER,
   layersSetup,
-  constructLayerToDna,
   loadLayerImg,
+  outputFiles,
   paintLayers,
+  sortZIndex,
+  writeMetaData,
 } = require("../src/main");
 
 const dnaFilePath = `${basePath}/build/_dna.json`;
@@ -46,8 +48,33 @@ const setup = () => {
     });
   }
   fs.mkdirSync(outputDir);
+  fs.mkdirSync(path.join(outputDir, "/json"));
+  fs.mkdirSync(path.join(outputDir, "/images"));
   // fs.mkdirSync(path.join(metadataBuildPath, "/json"));
 };
+
+function parseEditionNumFromDNA(dnaStrand) {
+  // clean dna of edition num
+  const editionExp = /\d+\//;
+  return Number(editionExp.exec(dnaStrand)[0].replace("/", ""));
+}
+
+function regenerateSingleMetadataFile() {
+  const metadata = [];
+  const metadatafiles = fs.readdirSync(path.join(outputDir, "/json"));
+
+  console.log("\nBuilding _metadata.json");
+
+  metadatafiles.forEach((file) => {
+    const data = fs.readFileSync(path.join(outputDir, "/json", file));
+    metadata.push(JSON.parse(data));
+  });
+
+  fs.writeFileSync(
+    path.join(outputDir, "json", "_metadata.json"),
+    JSON.stringify(metadata, null, 2)
+  );
+}
 /**
  * Randomly selects a number within the range of built images.
  * Since images and json files in the build folder are assumed to be identical,
@@ -75,12 +102,11 @@ const regenerate = async (dnaData, options) => {
   let layerConfigIndex = 0;
   let abstractedIndexes = [];
   let drawIndex = 0;
-  for (
-    let i = 1;
-    i <= layerConfigurations[layerConfigurations.length - 1].growEditionSizeTo;
-    i++
-  ) {
-    abstractedIndexes.push(i);
+  for (let i = 0; i <= dnaData.length - 1; i++) {
+    // set abstractedIndexes from DNA
+
+    const edition = parseEditionNumFromDNA(dnaData[i]);
+    abstractedIndexes.push(edition);
   }
 
   const layers = layersSetup(layerConfigurations[layerConfigIndex].layersOrder);
@@ -96,20 +122,29 @@ const regenerate = async (dnaData, options) => {
       ? console.log(`DNA for index ${drawIndex}: \n`, dnaStrand)
       : null;
 
+    // clean dna of edition num
+    const editionExp = /\d+\//;
+
     let images =
-      typeof dnaStrand === "object" ? dnaStrand.join(DNA_DELIMITER) : dnaStrand;
+      typeof dnaStrand === "object"
+        ? dnaStrand.replace(editionExp, "").join(DNA_DELIMITER)
+        : dnaStrand.replace(editionExp, "");
 
     options.debug ? console.log("Rebuilding DNA:", images) : null;
     if (options.omit) {
       const dnaImages = images.split(DNA_DELIMITER);
       // remove every item whose address index matches the omitIndex
+      let elementsToDelete = [];
       dnaImages.forEach((element, index) => {
         if (element.startsWith(`${options.omit}.`)) {
-          dnaImages.splice(index, 1);
+          elementsToDelete.push(index);
         }
       });
+      const removedDnaImages = dnaImages.filter(
+        (el, index) => !elementsToDelete.includes(index)
+      );
 
-      images = dnaImages.join(DNA_DELIMITER);
+      images = removedDnaImages.join(DNA_DELIMITER);
     }
 
     let results = constructLayerToDna(images, layers);
@@ -120,13 +155,20 @@ const regenerate = async (dnaData, options) => {
       return [...images, ...layer.selectedElements];
     }, []);
 
-    allImages.forEach((layer) => {
+    // sort by z-index.
+    sortZIndex(allImages).forEach((layer) => {
       loadedElements.push(loadLayerImg(layer));
     });
 
     await Promise.all(loadedElements).then(async (renderObjectArray) => {
-      if (options.background) {
-        background.generate = options.background === "true";
+      // has background information?
+      const bgHSL = dnaStrand.match(/(___.*)/);
+      const generateBG = eval(options.background?.replace(/\s+/g, ""));
+      if (generateBG != false && bgHSL) {
+        background.HSL = bgHSL[0].replace("___", "");
+      }
+      if (!generateBG) {
+        background.generate = false;
       }
       const layerData = {
         dnaStrand,
@@ -136,15 +178,9 @@ const regenerate = async (dnaData, options) => {
       };
       paintLayers(ctxMain, renderObjectArray, layerData);
 
-      const editionCount = options.startIndex
-        ? Number(drawIndex) + Number(options.startIndex)
-        : drawIndex;
-      fs.writeFileSync(
-        `${outputDir}/${editionCount}${outputJPEG ? ".jpg" : ".png"}`,
-        canvas.toBuffer(`${outputJPEG ? "image/jpeg" : "image/png"}`)
-      );
-
+      outputFiles(abstractedIndexes, layerData, outputDir, canvas);
       drawIndex++;
+      abstractedIndexes.shift();
     });
   }
 };
@@ -163,7 +199,7 @@ program
   .option("-s, --source <source>", "Optional source path of _dna.json")
   .option("-d, --debug", "display additional logging")
   .option("-v, --verbose", "display even more additional logging")
-  .action((options, command) => {
+  .action(async (options, command) => {
     const dnaData = options.source
       ? require(path.join(basePath, options.source))
       : require(dnaFilePath);
@@ -184,7 +220,9 @@ program
       : null;
 
     setup();
-    regenerate(dnaData, options);
+    await regenerate(dnaData, options);
+    regenerateSingleMetadataFile();
+    console.log(chalk.green("DONE"));
   });
 
 program.parse();
