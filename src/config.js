@@ -149,6 +149,7 @@ const debugLogs = true;
 // if you use an empty/transparent file, set the name here.
 // it is possible to set more than one blank file name
 // IE if you want none of the "Skunk_tattoo" traits to show up, put it here as an emptyLayerName and it won't show up in the metadata
+// like const = emptyLayerName = ["NONE", "Skunk_tattoo"]
 const emptyLayerName = "NONE";
 
 /**
@@ -194,16 +195,6 @@ const traitValueOverrides = {
 
 const extraMetadata = {};
 
-const extraAttributes = () => [
-  //
-  //
-  // Note from Marsyas - I never personally found benefit from this section and preferred
-  // to use the blank png method I outined in the readme file
-  //
-  //
-  //
-
-];
 
 // Outputs an Keccack256 hash for the image. Required for provenance hash
 const hashImages = true;

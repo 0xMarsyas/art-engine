@@ -1,15 +1,15 @@
-//have youe ver wanted to name your NFTs instead of some boring description from opensea?//
-//this script depends on you using blank PNGs for the system//
-//there must be three folders labeled "First", "Middle", "Surname"//
-//also "Essence" and "Life Force", maybe I'll have to change those//
-//If you don't want a middle name leave it blank mofo//
+//Have youe ver wanted to name your NFTs instead of some boring description from opensea?//
+//This script depends on you using blank PNGs in the file stack//
+//The way this is configured, there must be three folders labeled "First", "Middle", "Surname"//
+//Also "Essence" and "Life Force" are a part of these//
+//If you don't want a middle name leave it blank//
 
-//ok lets dive in//
+//ok lets dive in!//
 
 
 // pull up the constants here//
-//filesync and shit//
-//define the directory we fuckin with, and the
+//filesync//
+//define the directory we are working with with///
 
 const fs = require("fs");
 const args = process.argv.slice(2);
@@ -75,8 +75,6 @@ inputFiles.forEach((file) => {
 
     
 
-
-    '"},{"trait_type":"Characteristics","value":"'
 
     //here we define what data we want to rewrite in all JSON files//
 
